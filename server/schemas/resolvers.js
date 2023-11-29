@@ -30,6 +30,26 @@ const resolvers = {
 
       return { token, user };
     },
+    saveBook: async (parent, { book }, context) => {
+      if (context.user) {
+        return User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $addToSet: { savedBooks: book } },
+          { new: true, runValidators: true }
+        );
+      }
+      throw AuthenticationError;
+    },
+    removeBook: async (parent, { book }, context) => {
+      if (context.user) {
+        return User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $pull: { savedBooks: { bookId: book.bookId } } },
+          { new: true }
+        );
+      }
+      throw AuthenticationError;
+    },
   },
 };
 
